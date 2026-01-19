@@ -1,58 +1,64 @@
-#include "raylib.h"
-#include "tinyfiledialogs.h"
-#include <string>
-#include <iostream>
+#include "view.h"
+#include "archive_service.h"
+// #include "dicom_loader.h" 
+
+enum class SystemState {
+    IDLE,
+    SELECTING,
+    LOADING,
+    VIEWING
+};
 
 int main() {
-    const int screen_width = 800;
-    const int screen_height = 450;
-
-    InitWindow(screen_width, screen_height, "DICOM Viewer - Step 2");
-    SetTargetFPS(60);
-
-    std::string current_file = "Nenhum arquivo selecionado";
+    View view;
+    AppState app_data;
     
-    Rectangle btn_bounds = { 10, 10, 200, 40 };
-    bool btn_hover = false;
+    SystemState current_state = SystemState::IDLE;
 
-    while (!WindowShouldClose()) {
-        Vector2 mouse_pos = GetMousePosition();
-        
-        if (CheckCollisionPointRec(mouse_pos, btn_bounds)) {
-            btn_hover = true;
+    view.LogToConsole(app_data, "Sistema iniciado. Estado: IDLE");
 
-            if (IsMouseButtonReleased(MOUSE_BUTTON_LEFT)) {
-                const char* filters[1] = { "*.dcm" };
-                const char* selection = tinyfd_openFileDialog(
-                    "Selecione um arquivo DICOM", 
-                    "", 
-                    1, 
-                    filters, 
-                    "Arquivos DICOM", 
-                    0
-                );
+    while (!view.ShouldClose()) {
+        ViewEvent input_event = view.HandleInput(app_data);
 
-                if (selection) {
-                    current_file = std::string(selection);
+        switch (current_state) {
+
+            case SystemState::IDLE:
+            case SystemState::VIEWING: 
+
+                if (input_event == ViewEvent::OpenButtonClicked) {
+                    view.LogToConsole(app_data, "Abrindo janela de arquivos...");
+                    current_state = SystemState::SELECTING;
                 }
+                break;
+
+            case SystemState::SELECTING: {
+                auto result = ArchiveService::SelectDicomFile(); //aqui que gera aviso de erro pelo sistema operacional
+
+                if (result.has_value()) {
+                    app_data.current_file_path = result.value();
+
+                    current_state = SystemState::LOADING;
+
+                } else {
+                    view.LogToConsole(app_data, "Selecao cancelada.");
+                    current_state = (app_data.current_file_path == "Nenhum arquivo selecionado") 
+                                    ? SystemState::IDLE 
+                                    : SystemState::VIEWING;
+                }
+                break;
             }
-        } else {
-            btn_hover = false;
+
+            case SystemState::LOADING: {
+                view.LogToConsole(app_data, "Iniciando carregamento do DICOM...");
+                view.LogToConsole(app_data, "Arquivo: " + app_data.current_file_path);
+                view.LogToConsole(app_data, "[SIMULACAO] Imagem carregada com sucesso.");
+                current_state = SystemState::VIEWING;
+                break;
+            }
         }
 
-        BeginDrawing();
-        ClearBackground(RAYWHITE);
-
-        DrawRectangleRec(btn_bounds, btn_hover ? LIGHTGRAY : GRAY);
-        DrawRectangleLines((int)btn_bounds.x, (int)btn_bounds.y, (int)btn_bounds.width, (int)btn_bounds.height, DARKGRAY);
-        DrawText("Abrir Arquivo (.dcm)", (int)btn_bounds.x + 20, (int)btn_bounds.y + 10, 10, BLACK);
-
-        DrawText("Arquivo Atual:", 10, 70, 20, DARKGRAY);
-        DrawText(current_file.c_str(), 10, 100, 10, MAROON);
-
-        EndDrawing();
+        view.Render(app_data);
     }
 
-    CloseWindow();
     return 0;
 }

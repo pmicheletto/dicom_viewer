@@ -7,4 +7,9 @@ Para desenvolver a visualização DICOM vou iniciar olhando para as bibliotecas 
 
     1.2 Vou desenvolver uma interface nível desenvolvedor, expondo informações do funcionamento.
 
-    1.3 O primeiro teste com a tinyfiledialogs gera um erro do sistema operacional "is not responding" isso acontece porque ir para o sistema de arquivo "pausa" o ciclo while da main() e o Ubuntu(meu caso) entende que o programa travou. Para resolver isso seria necessário utilizar threads, tenho que nao é necessário explorar esse ponto
+
+2. DESENVOLVIMENTO
+
+- O primeiro teste com a tinyfiledialogs gera um erro do sistema operacional "is not responding" isso acontece porque ir para o sistema de arquivo "pausa" o ciclo while da main() e o Ubuntu(meu caso) entende que o programa travou. Para resolver isso seria necessário utilizar threads, tenho que nao é necessário explorar esse ponto.
+- Distribuir classes de acordo com as responsabilidades para facilitar manutenção.
+- Segundo commit: responsabilidades organizadas!

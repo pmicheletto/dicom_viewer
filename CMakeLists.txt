@@ -28,6 +28,8 @@ file(DOWNLOAD
 
 add_executable(${PROJECT_NAME} 
     src/main.cpp
+    src/view.cpp
+    src/archive_service.cpp
     ${CMAKE_BINARY_DIR}/tinyfiledialogs.c
 )
 

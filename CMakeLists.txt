@@ -8,14 +8,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(FetchContent)
 FetchContent_Declare(
     raylib
-    # GIT_REPOSITORY https://github.com/raysan5/raylib.git
-    # GIT_TAG        master
-    SOURCE_DIR "/mnt/hd/azulindo/interface/raylib" # na fase de desenvolvimentou vou usar o clone de outra pasta
+    GIT_REPOSITORY https://github.com/raysan5/raylib.git
     GIT_TAG        master
 )
 FetchContent_MakeAvailable(raylib)
 
 # 2. TinyFileDialogs
+message(STATUS "Baixando tinyfiledialogs...")
 file(DOWNLOAD 
     https://raw.githubusercontent.com/native-toolkit/tinyfiledialogs/master/tinyfiledialogs.c
     ${CMAKE_BINARY_DIR}/tinyfiledialogs.c
@@ -25,21 +24,26 @@ file(DOWNLOAD
     ${CMAKE_BINARY_DIR}/tinyfiledialogs.h
 )
 
+find_package(DCMTK CONFIG REQUIRED)
 
 add_executable(${PROJECT_NAME} 
     src/main.cpp
     src/view.cpp
     src/archive_service.cpp
+    src/dicom_loader.cpp
     ${CMAKE_BINARY_DIR}/tinyfiledialogs.c
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
     src 
-    ${CMAKE_BINARY_DIR}
+    ${CMAKE_BINARY_DIR} 
+    ${DCMTK_INCLUDE_DIRS} 
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE 
-    raylib
+    raylib 
+    dcmjpeg ijg8 ijg12 ijg16
+    ${DCMTK_LIBRARIES}
 )
 
 # Para evitar que o windows abra um terminal atrás

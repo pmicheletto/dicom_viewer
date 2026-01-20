@@ -23,7 +23,7 @@ Para desenvolver a visualização DICOM vou iniciar olhando para as bibliotecas 
 - O requisito "Window Level/Width" foi implementado como automático e nao como interativo
 - Para 'suporte a imagens RGB' eu adicionei o laço:
 
-            if (dcm_image->isMonochrome()) {
+        if (dcm_image->isMonochrome()) {
             result.image.format = PIXELFORMAT_UNCOMPRESSED_GRAYSCALE;
         } else {
             result.image.format = PIXELFORMAT_UNCOMPRESSED_R8G8B8;
@@ -39,4 +39,7 @@ mas não consegui testar o funcionamento
     A implementação da interface foi toda hardcodada e utilizando números mágicos, seria ideal separa-los e criar uma classe config_view
     Todo o codigo foi organizado em Google Style
     Não me preocupei em verificar se a "cascata" de includes para otimização de memória
+
+Obs: 
+    Atualização de última hora (20/01 - 10h): eu estava achando o contraste ruim, até que encontrei que com dcm_image->setWindow(0) eu consigo puxar a config de contraste que vem dentro do dicom
     

@@ -56,8 +56,10 @@ bool DicomLoader::LoadPixelData(const std::string& path, DicomResult& result) {
         DJDecoderRegistration::cleanup();
         return false;
     }
-
-    dcm_image->setMinMaxWindow();
+    
+    if (!dcm_image->setWindow(0)) {
+        dcm_image->setHistogramWindow(0.02);
+    }
 
     unsigned long width = dcm_image->getWidth();
     unsigned long height = dcm_image->getHeight();
